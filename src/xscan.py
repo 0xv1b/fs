@@ -47,7 +47,7 @@ IPL = {}
 Theta = {}
 for i, key in enumerate(np.sort([*currents_detrend])):
     fit_x[key] = np.linspace(common.trans2ins(wedge_pos_data[key][0]),common.trans2ins(wedge_pos_data[key][-1]),1000)
-    popt,pcov = curve_fit(common.CEP_fit,common.trans2ins(wedge_pos_data[key]),currents_detrend_data[key]*1e-7*1e12,p0=pinit, maxfev=40000)
+    popt,pcov = curve_fit(common.CEP_fit,common.trans2ins(wedge_pos_data[key]),currents_detrend_data[key]*1e-7*1e12,p0=pinit, maxfev=40000) # Should be 1e-8
     fit_y[key] = common.CEP_fit(fit_x[key],popt[0],popt[1],popt[2],popt[3],popt[4],popt[5])
     # print(f"{key}:  {popt}")
     IPL[key] = 2*np.pi/popt[3]    

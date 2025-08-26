@@ -92,7 +92,7 @@ for keys in np.flip(np.sort([*currents_detrend])):
     for tick in tick_locations:
         axes[i][j].axvline(x=tick, color='r', linestyle='--', linewidth=0.8) # 'r' for red color
 
-    axes[i][j].plot(common.trans2ins(wedge_positions),currents_detrend[keys]*1e-7*1e12,"-dk", color="gray")
+    axes[i][j].plot(common.trans2ins(wedge_positions),currents_detrend[keys]*1e-7*1e12,"-dk", color="gray") # 1e-7 is correct
     axes[i][j].plot(fit_x[keys],fit_y[keys], color="purple")
     
     if j == 0:
@@ -171,8 +171,8 @@ plt.plot(E_field,CEP_current_minmax,'o:')
 plt.plot(x_values, np.exp(y_values))
 plt.xlabel('Peak electric field (V/nm)')
 plt.ylabel(r'$ I_{CEP} $ (pA)')
-#plt.yscale('log')
-#plt.xscale('log')
+plt.yscale('log')
+plt.xscale('log')
 plt.grid()
 plt.tight_layout()
 plt.show()
