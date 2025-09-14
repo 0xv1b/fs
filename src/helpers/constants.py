@@ -26,5 +26,5 @@ CEP_RIGHT_GREEN =  sorted(glob.glob('data/CEP_right_green/*'))
 CEP_MIDDLE_WO = sorted(glob.glob('data/CEP_middle_wo/*'))
 CEP_MIDDLE_GREEN =  sorted(glob.glob('data/CEP_middle_green/*'))
 
-OSC =sorted(glob.glob('data/osc/*.CSV'))
+OSC =sorted(glob.glob('data/Osc/*.CSV'))
 

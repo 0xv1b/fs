@@ -54,13 +54,13 @@ for j, filename in enumerate(constants.OSC):
     valley_offset = np.mean(valley_data)    
     
 
-    plt.text((up_zeroes[0] + down_zeroes[1])/2, 1.1 - valley_offset, 'On', horizontalalignment='center', fontsize=14)
-    plt.text((up_zeroes[1] + down_zeroes[1])/2, 1.1 - valley_offset, 'Off', horizontalalignment='center', fontsize=14)
+    plt.text((up_zeroes[0] + down_zeroes[1])/2, 1.1 - valley_offset, 'On', horizontalalignment='center', fontsize=18)
+    plt.text((up_zeroes[1] + down_zeroes[1])/2, 1.1 - valley_offset, 'Off', horizontalalignment='center', fontsize=18)
     plt.axhline(0, color='darkgrey', linestyle='--')
 
 
-    plt.xlabel('Time (ms)', fontsize='18')
-    plt.ylabel('Photocurrent (pA)', fontsize='18')
+    plt.xlabel('Time (ms)', fontsize=18)
+    plt.ylabel(r'$j_{Ph}$ (pA)', fontsize=18)
     #plt.title(str(filename), fontsize='16')
     plt.plot(df.time,df.current - valley_offset)
     #plt.grid(True, linestyle=':', alpha=0.6)

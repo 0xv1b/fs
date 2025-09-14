@@ -7,27 +7,19 @@ from matplotlib import rcParams
 
 import os
 
+rcParams['axes.linewidth'] = 1.5
+
 # --- Lorentzian function ---
 def lorentzian(x, A, x0, gamma):
     return A * gamma**2 / ((x - x0)**2 + gamma**2)
 
 # List of sample letters
 samples = ['A', 'C', 'E', 'G', 'H', 'I']
+#samples = ['A', 'B', 'C', 'D', 'E', 'I']
 file_template = r"data/Vibhor_MoS2/PL_Sample{}.txt"
 
-# Style: Nature-style aesthetics
-rcParams.update({
-    'font.size': 12,
-    'font.family': 'serif',
-    'axes.linewidth': 1.2,
-    'xtick.direction': 'in',
-    'ytick.direction': 'in',
-    'xtick.major.width': 1.1,
-    'ytick.major.width': 1.1,
-    'legend.frameon': False
-})
 
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(8, 6))
 
 # Process each PL file
 for sample in samples:
@@ -54,12 +46,13 @@ for sample in samples:
     #y_corrected /= np.max(y_corrected)  # normalize
 
     # Plot background-subtracted spectrum
-    plt.plot(x, y_corrected, label=f'Sample {sample}')
+    plt.plot(x, y_corrected) #, label=f'Sample {sample}')
 
 # Final plot formatting
-plt.xlabel('Photon Energy (eV)')
-plt.ylabel('Counts (a.u.)')
-plt.title('Photoluminescence MoS₂ Samples')
-plt.legend()
+plt.xlabel('Photon Energy (eV)', fontsize=18)
+plt.xlim(1.70,2.10)
+plt.ylabel('Counts (a.u.)', fontsize=18)
+plt.legend(["Sample A","Sample B","Sample C","Sample D","Sample E","Sample F"], fontsize=14)
+plt.tick_params(axis='both', which='major', labelsize=14)
 plt.tight_layout()
 plt.show()

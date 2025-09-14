@@ -33,11 +33,12 @@ pinit = [20,1,0.4,d,0.42,0]
 
 currents_detrend_data = {}
 wedge_pos_data = {}
-start = [1,1,1,1,1,1,1,1,1,1,1,1]
-end =   [1,1,1,1,1,1,1,1,1,1,1,1]
-for i, key in enumerate(np.sort([*currents_detrend])):
+start = [1,1,1,30,1,20,50,20,10,1 ,30,20]
+end =   [1,1,1,30,1,1 ,1 ,35,40,30,30,20]
+for i, key in enumerate(np.flip(np.sort([*currents_detrend]))):
     currents_detrend_data[key] = currents_detrend[key][start[i]:-end[i]]
     wedge_pos_data[key] = wedge_positions[start[i]:-end[i]]
+    #print(str(round(common.power2Efield(float(constants.power_powerCal_interpol(key))*1e-3,6.5e-15,5e-6)*1e-9,2)))
 
 
 
@@ -47,13 +48,15 @@ wavelength = {}
 IPL = {}
 Theta = {}
 j_0 = {}
-for i, key in enumerate(np.sort([*currents_detrend])):
+for i, key in enumerate(np.flip(np.sort([*currents_detrend]))):
     fit_x[key] = np.linspace(common.trans2ins(wedge_pos_data[key][0]),common.trans2ins(wedge_pos_data[key][-1]),1000)
     popt,pcov = curve_fit(common.CEP_fit,common.trans2ins(wedge_pos_data[key]),currents_detrend_data[key]*1e-7*1e12,p0=pinit, maxfev=40000)
     fit_y[key] = common.CEP_fit(fit_x[key],popt[0],popt[1],popt[2],popt[3],popt[4],popt[5])
     IPL[key] = 2*np.pi/popt[3]    
     Theta[key] = -np.pi/2 - popt[3]*popt[4]
+    print(Theta[key])
     j_0[key] = max([max(fit_y[key]), abs(min(fit_y[key]))])
+    #print(j_0[key])
     wavelength[key] = 2* np.pi / popt[3]
     CEP_amplitudes[key] = [round(abs(max(currents_detrend[key]*1e-8*1e12)-min(currents_detrend[key]*1e-8*1e12))/2,2),round(popt[0],2)]  
 
@@ -61,16 +64,18 @@ for i, key in enumerate(np.sort([*currents_detrend])):
 
 
 
-fig, axes = plt.subplots(4,3,figsize=(10, 4))
+fig, axes = plt.subplots(4,3,figsize=(16, 8))
 i = 0
 j = 0
 for keys in np.flip(np.sort([*currents_detrend])):
 
+    offset = 5.665
+
     def wedge2CEP(x):
-        return  x/wavelength[keys]
+        return  x/wavelength[keys] - offset
 
     def CEP2wedge(x):
-        return x*wavelength[keys]
+        return x*wavelength[keys] + offset
 
 
     axes[i][j].tick_params(axis='x', direction='in')
@@ -79,32 +84,36 @@ for keys in np.flip(np.sort([*currents_detrend])):
     axes[i][j].tick_params(axis='both', which='minor', labelsize=16)
 
     
-    period_axis = axes[i][j].secondary_xaxis('top', functions=(wedge2CEP, CEP2wedge))
-    period_axis.set_xlabel(r'Shift in CEP ($\pi$ radians)', fontsize=8)
-    period_axis.tick_params(axis='x', direction='in')
-    period_axis.tick_params(axis='both', which='major', labelsize=18)
-    period_axis.tick_params(axis='both', which='minor', labelsize=12)
+
+    if i==0:    
+        period_axis = axes[i][j].secondary_xaxis('top', functions=(wedge2CEP, CEP2wedge))
+        period_axis.set_xlabel(r'Shift in CEP ($\pi$ radians)', fontsize=18)
+        period_axis.tick_params(axis='x', direction='in')
+        period_axis.tick_params(axis='both', which='major', labelsize=14)
+        period_axis.tick_params(axis='both', which='minor', labelsize=12)
 
     
     tick_locations = period_axis.get_xticks()
 
     # 4. Iterate and draw a vertical line at each tick location
     for tick in tick_locations:
-        axes[i][j].axvline(x=tick, color='r', linestyle='--', linewidth=0.8) # 'r' for red color
+        pass#axes[i][j].axvline(x=tick, color='r', linestyle='--', linewidth=0.8) # 'r' for red color
 
     axes[i][j].plot(common.trans2ins(wedge_positions),currents_detrend[keys]*1e-7*1e12,"-dk", color="gray") # 1e-7 is correct
     axes[i][j].plot(fit_x[keys],fit_y[keys], color="purple")
     
+    axes[i][j].tick_params(axis='both', which='major', labelsize=14)
+    
     if j == 0:
-        axes[i][j].set_ylabel(r'$ I_{CEP} $ (pA)', fontsize = 18)
+        axes[i][j].set_ylabel(r'$j_{CEP}$ (pA)', fontsize = 18)
     if j != 0:
         axes[i][j].set_yticks([])
-    if (i == 2) or (i == 1 and j != 0):
+    if (i == 3):
         axes[i][j].set_xlabel('Wedge insertion (mm)', fontsize = 18)
-    if i != 2 and not (i == 1 and j != 0):
+    if i != 3:
         axes[i][j].set_xticks([])
 
-    axes[i][j].legend(title=str(round(common.power2Efield(float(constants.power_powerCal_interpol(keys))*1e-3,6.5e-15,5e-6)*1e-9,2)) + ' V/nm', loc='upper right', prop={'size': 16})
+    axes[i][j].legend(title=str(round(common.power2Efield(float(constants.power_powerCal_interpol(keys))*1e-3,6.5e-15,5e-6)*1e-9,2)) +  ' V/nm', loc='upper right', prop={'size': 16})
 
     axes[i][j].set_xlim(common.trans2ins(wedge_positions[0]), common.trans2ins(wedge_positions[-1]))
     axes[0][j].set_ylim(50, -50)
@@ -121,7 +130,9 @@ for keys in np.flip(np.sort([*currents_detrend])):
         continue
     
 
+plt.subplots_adjust(wspace=0.04, hspace=0.14)
 #plt.subplots_adjust(wspace=0.04, hspace=0.08)
+plt.savefig("./images/power.pdf")
 plt.show()
 
 
@@ -165,14 +176,35 @@ y_values = fits.linear(np.log(x_values),pinit[0],pinit[1]) # fit
 rect = plt.Rectangle((1.4, 3.8), 0.5, 1.8,
                      facecolor="red", alpha=0.2)
 ax = plt.gca()
-ax.add_patch(rect)
+#ax.add_patch(rect)
 
-plt.plot(E_field,CEP_current_minmax,'o:')
-plt.plot(x_values, np.exp(y_values))
-plt.xlabel('Peak electric field (V/nm)')
-plt.ylabel(r'$ I_{CEP} $ (pA)')
+plt.plot(E_field,CEP_current_minmax,'o:', label="Current")
+plt.plot(x_values, np.exp(y_values), label="Curve Fit")
+plt.xlabel(r'$\varepsilon_{0}$ (V/nm)',fontsize=18)
+plt.ylabel(r'$ j_{CEP} $ (pA)',fontsize=18)
 plt.yscale('log')
 plt.xscale('log')
-plt.grid()
+plt.legend(fontsize=14)
+#plt.grid()
 plt.tight_layout()
+plt.savefig("./images/power_scaling.pdf")
+plt.show()
+plt.close(plt.gcf())
+
+
+rect = plt.Rectangle((1.4, 3.8), 0.5, 1.8,
+                     facecolor="red", alpha=0.2)
+ax = plt.gca()
+#ax.add_patch(rect)
+
+plt.plot(E_field,CEP_current_minmax,'o:', label="Current")
+plt.plot(x_values, np.exp(y_values), label="Curve Fit")
+plt.xlabel(r'$\varepsilon_{0}$ (V/nm)',fontsize=18)
+plt.ylabel(r'$ j_{CEP} $ (pA)',fontsize=18)
+#plt.yscale('log')
+#plt.xscale('log')
+plt.legend(fontsize=14)
+#plt.grid()
+plt.tight_layout()
+plt.savefig("./images/power_scaling_exp.pdf")
 plt.show()

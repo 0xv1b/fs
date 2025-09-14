@@ -5,20 +5,10 @@ from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 from matplotlib import rcParams
 
+rcParams['axes.linewidth'] = 1.5
+
 import os
 
-
-# --- Nature-style plotting settings ---
-rcParams.update({
-    'font.size': 12,
-    'font.family': 'serif',
-    'axes.linewidth': 1.2,
-    'xtick.direction': 'in',
-    'ytick.direction': 'in',
-    'xtick.major.width': 1.1,
-    'ytick.major.width': 1.1,
-    'legend.frameon': False
-})
 
 
 
@@ -57,7 +47,7 @@ fitted_curves = []
 fitted_params = []
 
 for peak in peak_positions:
-    mask = (x > peak - 25) & (x < peak + 25)
+    mask = (x > peak - 35) & (x < peak + 35)
     x_peak = x[mask]
     y_peak = y_corrected[mask]
     p0 = [max(y_peak), peak, 5]
@@ -69,7 +59,7 @@ for peak in peak_positions:
         continue
 
 # --- Plot ---
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(8, 6))
 plt.plot(x, y_corrected, label='Background-subtracted', color='black', linewidth=1.5)
 
 # plt.axvspan(383.7, 389.6, color='0.9')
@@ -82,10 +72,13 @@ for (x_fit, y_fit), params, color in zip(fitted_curves, fitted_params, colors):
              ha='center', va='bottom', fontsize=10, color="gray")
     plt.fill(x_fit, y_fit, 'gray')
 
-plt.xlabel('Raman Shift (cm⁻¹)')
-plt.ylabel('Intensity (a.u.)')
-plt.title('Raman Spectrum of Monolayer MoS₂')
+plt.xlabel('Raman Shift (cm⁻¹)', fontsize=18)
+plt.ylabel('Intensity (a.u.)', fontsize=18)
 plt.tight_layout()
+plt.ylim(0,300)
+
+plt.tick_params(axis='both', which='major', labelsize=14)
+plt.xlim(360,440)
 plt.show()
 
 
@@ -148,7 +141,6 @@ for sample in samples:
 # --- Final touches ---
 plt.xlabel('Raman Shift (cm⁻¹)')
 plt.ylabel('Counts (a.u.)')
-plt.title('Raman Spectra MoS₂ Samples')
 plt.legend()
 plt.tight_layout()
 plt.show()

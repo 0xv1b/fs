@@ -90,16 +90,19 @@ for i,key in enumerate(np.sort([*currents_detrend])):
 # plt.show()
 
 
-fig, axes = plt.subplots(5,3,figsize=(10, 4))
+fig, axes = plt.subplots(5,3,figsize=(16, 8))
 i = 0
 j = 0
 for keys in np.sort([*currents_detrend]):
 
+    offset = 1.92
+
+
     def wedge2CEP(x):
-        return  x/wavelength[keys]
+        return  x/wavelength[keys] - offset
 
     def CEP2wedge(x):
-        return x*wavelength[keys]
+        return x*wavelength[keys] + offset
 
 
     axes[i][j].tick_params(axis='x', direction='in')
@@ -108,26 +111,26 @@ for keys in np.sort([*currents_detrend]):
     axes[i][j].tick_params(axis='both', which='minor', labelsize=16)
 
     
-    period_axis = axes[i][j].secondary_xaxis('top', functions=(wedge2CEP, CEP2wedge))
+    period_axis = axes[0][j].secondary_xaxis('top', functions=(wedge2CEP, CEP2wedge))
     
     period_axis.tick_params(axis='x', direction='in')
-    period_axis.tick_params(axis='both', which='major', labelsize=12)
-    period_axis.tick_params(axis='both', which='minor', labelsize=12)
+    period_axis.tick_params(axis='both', which='major', labelsize=14)
+    period_axis.tick_params(axis='both', which='minor', labelsize=14)
 
     tick_locations = period_axis.get_xticks()
 
     # 4. Iterate and draw a vertical line at each tick location
     for tick in tick_locations:
-        axes[i][j].axvline(x=tick, color='r', linestyle='--', linewidth=0.8) # 'r' for red color
+        pass#axes[i][j].axvline(x=tick, color='r', linestyle='--', linewidth=0.8) # 'r' for red color
 
 
     axes[i][j].plot(common.trans2ins(wedge_positions),currents_detrend[keys]*1e-7*1e12,"-dk", color="gray")
     axes[i][j].plot(fit_x[keys],fit_y[keys], color="purple")
     
     if i == 0:
-        period_axis.set_xlabel(r'Shift in CEP ($\pi$ radians)', fontsize=8)
+        period_axis.set_xlabel(r'Shift in CEP ($\pi$ radians)', fontsize=18)
     if j == 0:
-        axes[i][j].set_ylabel(r'$ I_{CEP} $ (pA)', fontsize = 18)
+        axes[i][j].set_ylabel(r'$j_{CEP}$ (pA)', fontsize = 18)
     if j != 0:
         axes[i][j].set_yticks([])
     if (i == 4) or (i == 3 and j != 0):
@@ -138,11 +141,12 @@ for keys in np.sort([*currents_detrend]):
     axes[i][j].legend(title=str(np.round(keys, decimals=3)) + ' cm', loc='upper left', prop={'size': 16})
 
     axes[i][j].set_xlim(common.trans2ins(wedge_positions[0]), common.trans2ins(wedge_positions[-1]))
+    axes[i][j].tick_params(axis='both', which='major', labelsize=14)
     
     axes[0][j].set_ylim(50, -50)
     axes[1][j].set_ylim(50, -50)
     axes[2][j].set_ylim(50, -50)
-    axes[3][j].set_ylim(300, -300)
+    axes[3][j].set_ylim(600, -600)
     axes[4][j].set_ylim(50, -50)
 
     if j == 2:
@@ -157,28 +161,36 @@ axes[4][1].axis('off')
 axes[4][2].axis('off')
 
 #plt.subplots_adjust(wspace=0.04, hspace=0.08)
+plt.subplots_adjust(wspace=0.04, hspace=0.14)
+plt.savefig("./images/xscan180.pdf")
 plt.show()
 
 ax = plt.gca()
 
 average_ipl = 0.113
+x_offset = 2.08*2
+
 def wedge2CEP(x):
-    return  x/average_ipl
+    return  2*x/(average_ipl) - x_offset
 
 def CEP2wedge(x):
-    return x*average_ipl
+    return x*average_ipl/2 + x_offset
 
 period_axis = ax.secondary_xaxis('top', functions=(wedge2CEP, CEP2wedge))
 period_axis.tick_params(axis='x', direction='in')
-period_axis.tick_params(axis='both', which='major', labelsize=12)
+period_axis.tick_params(axis='both', which='major', labelsize=14)
 period_axis.tick_params(axis='both', which='minor', labelsize=12)
-
-plt.plot(fit_x[1.17],fit_y[1.17], color="blue")
-plt.plot(fit_x[1.155],fit_y[1.155], color="gray")
-plt.plot(fit_x[1.146],fit_y[1.146], color="red")
-plt.xlabel('Wedge insertion (mm)')
-plt.ylabel(r'$ I_{CEP} $ (pA)')
+period_axis.set_xlabel(r'Shift in CEP ($\pi$ radians)', fontsize=18)
+plt.plot(fit_x[1.17],fit_y[1.17], color="blue", label="Right Contact")
+plt.scatter(common.trans2ins(wedge_pos_data[1.17]),currents_detrend_data[1.17]*1e-7*1e12, marker="s", color="lightblue")
+#plt.plot(fit_x[1.155],fit_y[1.155], color="gray")
+plt.plot(fit_x[1.146],fit_y[1.146], color="red", label="Left Contact")
+plt.scatter(common.trans2ins(wedge_pos_data[1.146]),currents_detrend_data[1.146]*1e-7*1e12, marker="s", color="pink")
+plt.xlabel('Wedge insertion (mm)', fontsize=18)
+plt.ylabel(r'$ j_{CEP} $ (pA)', fontsize=18)
 plt.xlim(min(fit_x[1.17]), max(fit_x[1.17]))
-plt.grid()
+plt.legend(fontsize=18)
+plt.tick_params(axis='both', which='major', labelsize=14)
 plt.tight_layout()
+plt.savefig("./images/xscan180_curves.pdf")
 plt.show()

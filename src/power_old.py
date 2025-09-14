@@ -39,11 +39,12 @@ ax.tick_params(axis='both', which='major', labelsize=14)
 plt.plot(constants.angle_powerCal,common.power2Efield(constants.power_powerCal*1e3*1e-3,6.5e-15,5e-6)*1e-9,linewidth='2',label='Data')
 plt.plot(constants.angle_powerCal_interpol,common.power2Efield(constants.power_powerCal_interpol(constants.angle_powerCal_interpol)*1e-3,6.5e-15,5e-6)*1e-9,linewidth='2',label='Fit')
 plt.xlabel('ND filter wheel angle (°)', fontsize=14)
-plt.ylabel('Peak electric field (V/nm)', fontsize=14)
+plt.ylabel(r'$\varepsilon_{0}$ (V/nm)', fontsize=14)
 plt.legend(fontsize=16)
 #plt.grid()
 plt.tight_layout()
 
+plt.savefig("./images/power_calibration.pdf")
 plt.show()
 
 

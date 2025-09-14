@@ -2,6 +2,7 @@ from . import common
 import numpy as np
 import re
 import h5py
+import matplotlib.pyplot as plt
 
 def init_lists(filenames, scans, scans_detrend, wedge_pos_array, projection_phase=116, xscan=False):
     for filename in filenames:
@@ -49,7 +50,13 @@ def get_detrended_currents(scans, currents, deg=8):
         coefficients = np.polyfit(x, currents[key], deg)
         polyfit = np.polyval(coefficients, x)
         currents_detrend[key] = currents[key] - polyfit
+
+        #fig, ax = plt.subplots()
+        #ax.plot(scans[key], currents[key])
+        #plt.show()
     
+
+
     return currents_detrend
 
 def init_pump(filenames, wedge_pos_array, trace,projection_phase=116):
@@ -64,7 +71,7 @@ def init_pump(filenames, wedge_pos_array, trace,projection_phase=116):
         
         trace.append(current)
 
-def get_detrended_currents_pump(currents, trace, deg=8):
+def get_detrended_currents_pump(currents, trace, deg=8, positions=[]):
     currents_detrend = []
     currents = np.mean(trace,axis=0)
     #currents_detrend = polynomial(currents,order=8,plot=True)
